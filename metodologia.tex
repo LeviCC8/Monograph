@@ -1,0 +1,22 @@
+\chapter{METODOLOGIA}
+
+Este capítulo possui o objetivo de explicar e detalhar os materiais e métodos utilizados para a extração dos resultados expostos neste trabalho. As próximas seções apresentam, respectivamente, a configuração do ambiente, as métricas de comparação, os conjuntos de dados utilizados, as arquiteturas e treinamento das redes neurais artificiais treinadas e os experimentos realizados.
+
+
+\section{Configuração do Ambiente}
+Para a extração dos resultados, os algoritmos foram executados em um computador com processador \textit{Intel Core i7 2.8GHz} com 16 \textit{GByte} de memória RAM. Todos os algoritmos e procedimentos descritos neste trabalho foram realizados utilizando a linguagem \textit{Python}. O treinamento, teste e manipulação das redes neurais artificiais foram executados utilizando as bibliotecas \textit{Tensorflow 2.x} e \textit{Keras}. O CPLEX 20.1.0 foi usado como o oráculo para a modelagem e resolução dos problemas MILP formulados, a biblioteca \textit{DOcplex} foi responsável pela integração do oráculo com o \textit{Python}.
+
+\section{Métricas}
+
+O tempo de execução, em segundos, dos algoritmos testados é a métrica utilizada para comparação de escalabilidade. Para uma análise da minimalidade entre as explicações computadas pelos diferentes algoritmos, é utilizada a métrica de tamanho da explicação (número de \textit{features} consideradas relevantes para explicar a saída da ANN). Além disso, para cada uma dessas métricas, é computado o valor mínimo, médio e máximo em relação ao conjunto de dados analisado.
+
+\section{Conjuntos de Dados}
+Os conjuntos de dados selecionados para a extração dos resultados são pertencentes aos repositórios UCI \textit{Machine Learning} \cite{uci} e \textit{Penn Machine Learning Benchmarks} \cite{pennML}, possuindo entre 9 à 32 \textit{features} e 164 à 691 amostras. Os conjuntos de dados são: \textit{australian}, \textit{auto}, \textit{backache}, \textit{breast-cancer}, \textit{cleve}, \textit{cleveland}, \textit{glass}, \textit{glass2}, \textit{heart-statlog}, \textit{hepatitis}, \textit{spect} e \textit{voting}. 
+
+\section{Arquiteturas e Treinamento das Redes Neurais Artificiais}
+
+As redes neurais artificiais codificadas para o uso do algoritmo proposto possuem uma arquitetura com uma camada  ReLU oculta de 20 neurônios e uma camada de saída Softmax para a predição. Ressalta-se a normalização das variáveis continuas dos conjuntos de dados para a melhora da acurácia da ANN durante o treinamento. Para o treinamento de todas as redes foi utilizado o otimizador \textit{Adam} com taxa de aprendizagem de 0,001, separação do conjunto de dados com 80\% para treino e 20\% para teste, tamanho de lote de 4 e, dependendo do conjunto de dados, entre 50 à 100 épocas. 
+
+\section{Experimentos}
+
+Os experimentos realizados iniciam com o treinamento das redes neurais artificiais, seguido de suas codificações como restrições MILP de acordo uma das modelagens apontadas. Então, a explicação de cada amostra para todos os conjuntos de dados selecionados é calculada, guardando o seu tempo de processamento e tamanho para o cálculo mínimo, médio e máximo dessas métricas. Esses resultados são gerados para todos os algoritmos comparados neste trabalho.
