@@ -1,22 +1,25 @@
 \chapter{METODOLOGIA}
 
-Este capítulo possui o objetivo de explicar e detalhar os materiais e métodos utilizados para a extração dos resultados expostos neste trabalho. As próximas seções apresentam, respectivamente, a configuração do ambiente, as métricas de comparação, os conjuntos de dados utilizados, as arquiteturas e treinamento das redes neurais artificiais treinadas e os experimentos realizados.
+Este capítulo possui o objetivo de explicar e detalhar os materiais e métodos utilizados para a extração dos resultados expostos neste trabalho, apresentando as abordagens implementadas, a configuração do ambiente, as métricas de comparação, os conjuntos de dados utilizados, as arquiteturas e treinamento das redes neurais artificiais treinadas e os experimentos realizados.
 
+O algoritmo para a computação de explicações para as saídas de redes neurais proposto por \citeonline{Ignatiev_abduction} foi implementado para a comparação com os outros métodos. Nessa abordagem, a rede é codificada como um conjunto de restrições MILP com base em \citeonline{milp_01}, que faz o uso de \textit{indicator constraints} para a representação do comportamento da função de ativação ReLU. Então, dado uma instância $C$ associado com a predição $E$ tal que $C \wedge F \models E$ (equivalente à $C \models (F \rightarrow E)$), onde \textit{F} são as restrições MILP já calculadas, é computada a explicação mínima $C_m$ (dado $C$) que é implicante principal de  $F \rightarrow E$. Destaca-se que $\neg E$ é representado nas restrições com o auxílio de \textit{indicator constraints}.
 
-\section{Configuração do Ambiente}
+O implicante principal $C_m$ é calculado removendo separadamente cada \textit{feature} pertencente à $C$, gerando $C'$. Sabendo que $C \wedge F \wedge \neg E$ é insatisfatível, se, após a remoção de uma \textit{feature}, $C' \wedge F \wedge \neg E$ continuar insatisfatível, é considerado que aquela \textit{feature} não era relevante para explicação e, então, não pertencerá à $C_m$, caso contrário ela é mantida.
+
+Ressalta-se que para o cálculo de explicações mínimas consistentes, é necessário definir o domínio e os limites de cada \textit{feature}, pois, caso contrário, durante a resolução do problema MILP formulado pode ser encontrado uma solução na qual uma \textit{feature} $x_i$ tenha recebido um valor que não pertença aos possíveis valores encontrados no mundo real. Assim, ambos cenários foram testados para a extração dos resultados: com e sem as \textit{features} restringidas, a fim de demonstrar a necessidade dessa restrição. 
+
+Esse algoritmo foi modificado substituindo a codificação utilizada pela proposta em \citeonline{milp_top}, a fim de melhorar a escalabilidade da versão original. Como essa abordagem é utilizada para a verificação de robustez de ANNs, também foi necessária uma adaptação para a representação de $E$ para o funcionamento do algoritmo. Para evitar o uso das \textit{indicator constraints}, a restrição de $\neg E$ foi formulada com o auxílio dos limites superiores das pré-ativações dos neurônios da última camada da rede neural.
+
 Para a extração dos resultados, os algoritmos foram executados em um computador com processador \textit{Intel Core i7 2.8GHz} com 16 \textit{GByte} de memória RAM. Todos os algoritmos e procedimentos descritos neste trabalho foram realizados utilizando a linguagem \textit{Python}. O treinamento, teste e manipulação das redes neurais artificiais foram executados utilizando as bibliotecas \textit{Tensorflow 2.x} e \textit{Keras}. O CPLEX 20.1.0 foi usado como o oráculo para a modelagem e resolução dos problemas MILP formulados, a biblioteca \textit{DOcplex} foi responsável pela integração do oráculo com o \textit{Python}.
 
-\section{Métricas}
 
 O tempo de execução, em segundos, dos algoritmos testados é a métrica utilizada para comparação de escalabilidade. Para uma análise da minimalidade entre as explicações computadas pelos diferentes algoritmos, é utilizada a métrica de tamanho da explicação (número de \textit{features} consideradas relevantes para explicar a saída da ANN). Além disso, para cada uma dessas métricas, é computado o valor mínimo, médio e máximo em relação ao conjunto de dados analisado.
 
-\section{Conjuntos de Dados}
+
 Os conjuntos de dados selecionados para a extração dos resultados são pertencentes aos repositórios UCI \textit{Machine Learning} \cite{uci} e \textit{Penn Machine Learning Benchmarks} \cite{pennML}, possuindo entre 9 à 32 \textit{features} e 164 à 691 amostras. Os conjuntos de dados são: \textit{australian}, \textit{auto}, \textit{backache}, \textit{breast-cancer}, \textit{cleve}, \textit{cleveland}, \textit{glass}, \textit{glass2}, \textit{heart-statlog}, \textit{hepatitis}, \textit{spect} e \textit{voting}. 
 
-\section{Arquiteturas e Treinamento das Redes Neurais Artificiais}
 
 As redes neurais artificiais codificadas para o uso do algoritmo proposto possuem uma arquitetura com uma camada  ReLU oculta de 20 neurônios e uma camada de saída Softmax para a predição. Ressalta-se a normalização das variáveis continuas dos conjuntos de dados para a melhora da acurácia da ANN durante o treinamento. Para o treinamento de todas as redes foi utilizado o otimizador \textit{Adam} com taxa de aprendizagem de 0,001, separação do conjunto de dados com 80\% para treino e 20\% para teste, tamanho de lote de 4 e, dependendo do conjunto de dados, entre 50 à 100 épocas. 
 
-\section{Experimentos}
 
 Os experimentos realizados iniciam com o treinamento das redes neurais artificiais, seguido de suas codificações como restrições MILP de acordo uma das modelagens apontadas. Então, a explicação de cada amostra para todos os conjuntos de dados selecionados é calculada, guardando o seu tempo de processamento e tamanho para o cálculo mínimo, médio e máximo dessas métricas. Esses resultados são gerados para todos os algoritmos comparados neste trabalho.
